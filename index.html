@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Exchange PRO – Version Démo</title>
+<title>Trading First – Démo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -19,13 +19,14 @@ small{color:#94a3b8}
 h2,h3{margin-top:0}
 .market{height:360px;background:#020617;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8}
 .nav{display:flex;gap:10px}
+.contact-card{background:#111827;padding:12px;border-radius:8px;margin-top:20px}
 </style>
 </head>
 
 <body>
 
 <header>
-  <strong>Exchange PRO</strong>
+  <strong>Trading First</strong>
   <div class="nav">
     <button class="secondary" onclick="show('login')">Connexion</button>
     <button class="primary" onclick="show('signup')">S’inscrire</button>
@@ -35,7 +36,7 @@ h2,h3{margin-top:0}
 <section id="home">
   <h2>Plateforme de Trading Numérique</h2>
   <p>Solution moderne conforme aux standards des exchanges internationaux.</p>
-  <div class="market" id="tradingChartContainer">
+  <div class="market">
     <canvas id="tradingChart"></canvas>
   </div>
 </section>
@@ -61,34 +62,19 @@ h2,h3{margin-top:0}
 
 <section id="user" class="hidden">
   <h2>Tableau de bord utilisateur</h2>
-
   <div class="card">
     <strong>UID utilisateur :</strong> <span id="uid"></span>
   </div>
-
   <div class="card">
     <h3>Signal de trading</h3>
     <button class="primary" onclick="getSignal()">Trader</button>
     <p id="signalMsg"></p>
-  </div>
-
-  <div class="card">
-    <h3>Retrait</h3>
-    <p>UID administrateur requis (expire après usage)</p>
-    <input placeholder="UID admin">
-    <button class="secondary">Demander retrait</button>
-  </div>
-
-  <div class="card">
-    <h3>Historique</h3>
-    <small>Aucune transaction réelle – environnement simulé</small>
   </div>
 </section>
 
 <section id="admin" class="hidden">
   <h2>Dashboard Administrateur</h2>
 
-  <!-- Envoyer solde utilisateur -->
   <div class="card">
     <h3>Envoyer solde utilisateur</h3>
     <input id="adminUID" placeholder="UID utilisateur">
@@ -98,7 +84,6 @@ h2,h3{margin-top:0}
     <small>Double confirmation requise</small>
   </div>
 
-  <!-- Gestion des signaux -->
   <div class="card">
     <h3>Gestion des signaux</h3>
     <p>4 signaux toutes les 4 heures</p>
@@ -106,32 +91,26 @@ h2,h3{margin-top:0}
     <div id="adminSignalMsg" class="notice"></div>
   </div>
 
-  <!-- Solde Admin -->
   <div class="card">
     <h3>Solde total Admin</h3>
-    <strong id="adminBalance">0 USDT</strong>
+    <strong id="adminBalance">1000 USDT</strong>
   </div>
 </section>
 
+<section id="contacts">
+  <h2>Contacts d'urgence</h2>
+  <div class="contact-card">
+    <p>Email support principal : <a href="mailto:support@tradingfirst.com">support@tradingfirst.com</a></p>
+  </div>
+</section>
+
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+
 <script>
-function getSignal(){
-  const now = Date.now();
-  const FOUR_HOURS = 4 * 60 * 60 * 1000;
-
-  if(now - lastSignal < FOUR_HOURS){
-    const minutes = Math.ceil((FOUR_HOURS - (now - lastSignal)) / 60000);
-    document.getElementById("signalMsg").innerText =
-      "⏳ Signal indisponible – prochain dans " + minutes + " min";
-    return;
-  }
-
-  lastSignal = now;
-  localStorage.setItem("lastSignalTime", lastSignal);
-
-  document.getElementById("signalMsg").innerText =
-    "📈 Signal généré – tendance haussière (simulation)";
-}
+let lastSignal = 0;
+let adminTotal = 1000;
 
 function show(id){
   document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
@@ -144,123 +123,38 @@ function signup(){
 }
 
 const ADMIN_EMAIL = "admin";
-const ADMIN_PASS = "admin123"; // identifiant admin fixe
+const ADMIN_PASS = "admin123";
 
 function login(){
   const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPass").value.trim();
+  if(!email || !pass){ alert("Veuillez remplir tous les champs"); return; }
+  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){ show("admin"); return; }
 
-  if(!email || !pass){
-    alert("Veuillez remplir tous les champs");
-    return;
-  }
-
-  // 🔐 Connexion ADMIN
-  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
-    show("admin");
-    return;
-  }
-
-  // 👤 Connexion UTILISATEUR
-  document.getElementById("uid").innerText =
-    "UID-" + Math.floor(10000 + Math.random() * 90000);
+  document.getElementById("uid").innerText = "UID-" + Math.floor(10000 + Math.random()*90000);
   show("user");
 }
 
 function getSignal(){
   const now = Date.now();
-  const FOUR_HOURS = 4 * 60 * 60 * 1000;
-
+  const FOUR_HOURS = 4*60*60*1000;
   if(now - lastSignal < FOUR_HOURS){
-    const minutes = Math.ceil((FOUR_HOURS - (now - lastSignal)) / 60000);
-    document.getElementById("signalMsg").innerText =
-      "⏳ Signal indisponible – prochain dans " + minutes + " min";
+    const minutes = Math.ceil((FOUR_HOURS - (now - lastSignal))/60000);
+    document.getElementById("signalMsg").innerText = "⏳ Signal indisponible – prochain dans " + minutes + " min";
     return;
   }
-
   lastSignal = now;
   localStorage.setItem("lastSignalTime", lastSignal);
-
-  document.getElementById("signalMsg").innerText =
-    "📈 Signal généré – tendance haussière (simulation)";
+  document.getElementById("signalMsg").innerText = "📈 Signal généré – tendance haussière (simulation)";
 }
-
-// --- GRAPH TRADINGVIEW SIMULÉ ---
-const ctx = document.getElementById('tradingChart').getContext('2d');
-new Chart(ctx, {
-    type: 'line', // visuel pro
-    data: {
-        labels: ['09h','10h','11h','12h','13h','14h','15h'],
-        datasets: [{
-            label: 'USD/USDT',
-            data: [100,102,106,105,110,113,116],
-            borderColor: '#ff9800',
-            backgroundColor: '#2563eb',
-            fill: true
-        }]
-    },
-    options: {
-        responsive:true,
-        plugins:{legend:{display:false}},
-        scales:{
-            x:{grid:{color:'#1e293b'}},
-            y:{grid:{color:'#1e293b'}}
-        }
-    }
-});
-</script>const chartEl = document.getElementById("tradingChart");
-
-if(chartEl){
-  const ctx = chartEl.getContext("2d");
-
-  const data = {
-    datasets: [{
-      label: "BTC/USDT",
-      data: [
-        {x:1, o:100, h:110, l:95, c:105},
-        {x:2, o:105, h:115, l:100, c:112},
-        {x:3, o:112, h:118, l:108, c:110},
-        {x:4, o:110, h:120, l:109, c:118},
-        {x:5, o:118, h:125, l:115, c:122},
-        {x:6, o:122, h:130, l:120, c:128}
-      ]
-    }]
-  };
-
-  new Chart(ctx, {
-    type: 'candlestick',
-    data: data,
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-let adminTotal = 1000; // solde Admin simulé
 
 function sendBalance(){
   const uid = document.getElementById("adminUID").value.trim();
   const amount = parseFloat(document.getElementById("adminAmount").value);
-
-  if(!uid){
-    document.getElementById("adminMsg").innerText = "Veuillez entrer un UID";
-    return;
-  }
-  if(isNaN(amount) || amount <= 0){
-    document.getElementById("adminMsg").innerText = "Montant invalide";
-    return;
-  }
-  if(amount > adminTotal){
-    document.getElementById("adminMsg").innerText = "Solde insuffisant";
-    return;
-  }
-  if(!confirm(`Confirmer l'envoi de ${amount.toFixed(2)} USDT à ${uid} ?`)){
-    document.getElementById("adminMsg").innerText = "Envoi annulé";
-    return;
-  }
-
+  if(!uid){ document.getElementById("adminMsg").innerText = "Veuillez entrer un UID"; return; }
+  if(isNaN(amount) || amount <= 0){ document.getElementById("adminMsg").innerText = "Montant invalide"; return; }
+  if(amount > adminTotal){ document.getElementById("adminMsg").innerText = "Solde insuffisant"; return; }
+  if(!confirm(`Confirmer l'envoi de ${amount.toFixed(2)} USDT à ${uid} ?`)){ document.getElementById("adminMsg").innerText = "Envoi annulé"; return; }
   adminTotal -= amount;
   document.getElementById("adminBalance").innerText = adminTotal.toFixed(2) + " USDT";
   document.getElementById("adminMsg").innerText = `✅ ${amount.toFixed(2)} USDT envoyés à ${uid}`;
@@ -271,5 +165,21 @@ function adminSignal(){
   document.getElementById("adminSignalMsg").innerText = `Signal généré: ${gain} USDT`;
   lastSignal = Date.now();
   alert(`Signal admin généré: ${gain} USDT`);
-}</body>
+}
+
+// Graphique candlestick dynamique
+const chartEl = document.getElementById("tradingChart");
+if(chartEl){
+  const ctx = chartEl.getContext("2d");
+  const data = {datasets:[{label:"BTC/USDT", data:Array.from({length:20}, (_, i)=>{
+    const open = 100 + Math.random()*50;
+    const close = open + (Math.random()*10-5);
+    const high = Math.max(open, close) + Math.random()*5;
+    const low = Math.min(open, close) - Math.random()*5;
+    return {x:i+1,o:open,h:high,l:low,c:close};
+  })}]};
+  new Chart(ctx,{type:'candlestick',data:data,options:{responsive:true,plugins:{legend:{display:false}}}});
+}
+</script>
+</body>
 </html>
