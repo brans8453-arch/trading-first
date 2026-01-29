@@ -67,7 +67,34 @@ h2,h3{margin-top:0}
     <strong>UID utilisateur :</strong> <span id="uid"></span>
   </div>
   <div class="card">
-    <h3>Signal de trading</h3>
+    <h3>Signal de trading</h3>// --- Graphique utilisateur (ligne type exchange) ---
+const userChartEl = document.getElementById("userTradingChart");
+if(userChartEl){
+  const ctx = userChartEl.getContext("2d");
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['09h','10h','11h','12h','13h','14h','15h'],
+      datasets: [{
+        label: 'BTC/USDT',
+        data: [100, 102, 106, 105, 110, 113, 116],
+        borderColor: '#38bdf8',
+        backgroundColor: 'rgba(56, 189, 248, 0.2)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive:true,
+      plugins:{legend:{display:true, position:'top'}},
+      scales:{
+        x:{grid:{color:'#1e293b'}},
+        y:{grid:{color:'#1e293b'}}
+      }
+    }
+  });
+}
     <button class="primary" onclick="getSignal()">Trader</button>
     <p id="signalMsg"></p>
   </div>
