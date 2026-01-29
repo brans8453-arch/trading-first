@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Exchange PRO – Version Démo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
+header{position:sticky;top:0;background:#0f172a;padding:12px;display:flex;justify-content:space-between;align-items:center;z-index:1000}
+button{padding:8px 14px;border:none;border-radius:6px;cursor:pointer}
+.primary{background:#2563eb;color:#fff}
+.secondary{background:#1e293b;color:#fff}
+section{padding:40px 15px}
+.hidden{display:none}
+.card{background:#111827;padding:15px;border-radius:10px;margin-bottom:15px}
+input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}
+small{color:#94a3b8}
+h2,h3{margin-top:0}
+.market{height:300px;background:#020617;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8}
+.nav{display:flex;gap:10px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <strong>Exchange PRO</strong>
+  <div class="nav">
+    <button class="secondary" onclick="show('login')">Connexion</button>
+    <button class="primary" onclick="show('signup')">S’inscrire</button>
+  </div>
+</header>
+
+<section id="home">
+  <h2>Plateforme de Trading Numérique</h2>
+  <p>Solution moderne conforme aux standards des exchanges internationaux.</p>
+  <div class="market" id="tradingChartContainer">
+    <canvas id="tradingChart"></canvas>
+  </div>
+</section>
+
+<section id="login" class="hidden">
+  <div class="card">
+    <h3>Connexion</h3>
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPass" type="password" placeholder="Mot de passe">
+    <button class="primary" onclick="login()">Se connecter</button>
+  </div>
+</section>
+
+<section id="signup" class="hidden">
+  <div class="card">
+    <h3>Inscription</h3>
+    <input id="signEmail" placeholder="Email uniquement">
+    <input type="password" placeholder="Mot de passe">
+    <button class="primary" onclick="signup()">Créer un compte</button>
+    <small>Inscription par email uniquement (sécurité renforcée)</small>
+  </div>
+</section>
+
+<section id="user" class="hidden">
+  <h2>Tableau de bord utilisateur</h2>
+
+  <div class="card">
+    <strong>UID utilisateur :</strong> <span id="uid"></span>
+  </div>
+
+  <div class="card">
+    <h3>Signal de trading</h3>
+    <button class="primary" onclick="getSignal()">Trader</button>
+    <p id="signalMsg"></p>
+  </div>
+
+  <div class="card">
+    <h3>Retrait</h3>
+    <p>UID administrateur requis (expire après usage)</p>
+    <input placeholder="UID admin">
+    <button class="secondary">Demander retrait</button>
+  </div>
+
+  <div class="card">
+    <h3>Historique</h3>
+    <small>Aucune transaction réelle – environnement simulé</small>
+  </div>
+</section>
+
+<section id="admin" class="hidden">
+  <h2>Dashboard Administrateur</h2>
+
+  <div class="card">
+    <h3>Envoyer solde utilisateur</h3>
+    <input placeholder="UID utilisateur">
+    <input placeholder="Montant USDT">
+    <button class="primary">Valider envoi</button>
+    <small>Double confirmation requise</small>
+  </div>
+
+  <div class="card">
+    <h3>Gestion des signaux</h3>
+    <p>4 signaux toutes les 4 heures</p>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let lastSignal = 0;
+
+function show(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function signup(){
+  alert("Compte créé (démo)");
+  show("login");
+}
+
+function login(){
+  const email=document.getElementById("loginEmail").value;
+  if(email==="admin"){
+    show("admin");
+  }else{
+    document.getElementById("uid").innerText="UID-"+Math.floor(Math.random()*99999);
+    show("user");
+  }
+}
+
+function getSignal(){
+  const now=Date.now();
+  if(now-lastSignal<4*60*60*1000){
+    document.getElementById("signalMsg").innerText="⏳ Signal indisponible – prochain dans 4h";
+  }else{
+    lastSignal=now;
+    document.getElementById("signalMsg").innerText="📈 Signal généré – marché simulé";
+  }
+}
+
+// --- GRAPH TRADINGVIEW SIMULÉ ---
+const ctx = document.getElementById('tradingChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line', // visuel pro
+    data: {
+        labels: ['09h','10h','11h','12h','13h','14h','15h'],
+        datasets: [{
+            label: 'USD/USDT',
+            data: [100,102,106,105,110,113,116],
+            borderColor: '#ff9800',
+            backgroundColor: '#2563eb',
+            fill: true
+        }]
+    },
+    options: {
+        responsive:true,
+        plugins:{legend:{display:false}},
+        scales:{
+            x:{grid:{color:'#1e293b'}},
+            y:{grid:{color:'#1e293b'}}
+        }
+    }
+});
+</script>
+
+</body>
+</html>
