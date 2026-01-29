@@ -157,13 +157,21 @@ function login(){
 }
 
 function getSignal(){
-  const now=Date.now();
-  if(now-lastSignal<4*60*60*1000){
-    document.getElementById("signalMsg").innerText="⏳ Signal indisponible – prochain dans 4h";
-  }else{
-    lastSignal=now;
-    document.getElementById("signalMsg").innerText="📈 Signal généré – marché simulé";
+  const now = Date.now();
+  const FOUR_HOURS = 4 * 60 * 60 * 1000;
+
+  if(now - lastSignal < FOUR_HOURS){
+    const minutes = Math.ceil((FOUR_HOURS - (now - lastSignal)) / 60000);
+    document.getElementById("signalMsg").innerText =
+      "⏳ Signal indisponible – prochain dans " + minutes + " min";
+    return;
   }
+
+  lastSignal = now;
+  localStorage.setItem("lastSignalTime", lastSignal);
+
+  document.getElementById("signalMsg").innerText =
+    "📈 Signal généré – tendance haussière (simulation)";
 }
 
 // --- GRAPH TRADINGVIEW SIMULÉ ---
