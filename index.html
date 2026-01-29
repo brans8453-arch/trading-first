@@ -28,9 +28,10 @@ h2,h3{margin-top:0}
 <header>
   <strong>Trading First</strong>
   <div class="nav">
-    <button class="secondary" onclick="show('login')">Connexion</button>
-    <button class="primary" onclick="show('signup')">S’inscrire</button>
-  </div>
+    <button id="btnLogin" class="secondary" onclick="show('login')">Connexion</button>
+<button id="btnSignup" class="primary" onclick="show('signup')">S’inscrire</button>
+<button id="btnProfile" class="secondary hidden" onclick="logout()">Profil</button>
+  <button id="btnProfile" class="secondary hidden" onclick="logout()">Profil</button></div>
 </header>
 
 <section id="home">
@@ -109,7 +110,16 @@ h2,h3{margin-top:0}
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
 <script>
-let lastSignal = 0;
+function toggleHeaderButtons(isLoggedIn){
+  document.getElementById("btnLogin").classList.toggle("hidden", isLoggedIn);
+  document.getElementById("btnSignup").classList.toggle("hidden", isLoggedIn);
+  document.getElementById("btnProfile").classList.toggle("hidden", !isLoggedIn);
+}
+
+function logout(){
+  show("home");
+  toggleHeaderButtons(false);
+}let lastSignal = 0;
 let adminTotal = 1000;
 
 function show(id){
@@ -129,7 +139,7 @@ function login(){
   const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPass").value.trim();
   if(!email || !pass){ alert("Veuillez remplir tous les champs"); return; }
-  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){ show("admin"); return; }
+  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){ show("admin"); return; }toggleHeaderButtons(true); // montre Profil, cache Connexion/S’inscrire
 
   document.getElementById("uid").innerText = "UID-" + Math.floor(10000 + Math.random()*90000);
   show("user");
@@ -164,7 +174,16 @@ function adminSignal(){
   const gain = (Math.random()*10-5).toFixed(2);
   document.getElementById("adminSignalMsg").innerText = `Signal généré: ${gain} USDT`;
   lastSignal = Date.now();
-  alert(`Signal admin généré: ${gain} USDT`);
+  alert(`Signal admin généré: ${gain} USDT`);function toggleHeaderButtons(isLoggedIn){
+  document.getElementById("btnLogin").classList.toggle("hidden", isLoggedIn);
+  document.getElementById("btnSignup").classList.toggle("hidden", isLoggedIn);
+  document.getElementById("btnProfile").classList.toggle("hidden", !isLoggedIn);
+}
+
+function logout(){
+  show("home");
+  toggleHeaderButtons(false);
+  }
 }
 
 // Graphique candlestick dynamique
