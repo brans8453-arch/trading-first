@@ -88,52 +88,29 @@ h2,h3{margin-top:0}
 <section id="admin" class="hidden">
   <h2>Dashboard Administrateur</h2>
 
+  <!-- Envoyer solde utilisateur -->
   <div class="card">
-  <h3>Envoyer solde utilisateur</h3>
-  <input id="adminUID" placeholder="UID utilisateur">
-  <input id="adminAmount" placeholder="Montant USDT">
-  <button class="primary" onclick="sendBalance()">Valider envoi</button>
-  <div id="adminMsg"></div>
-  <small>Double confirmation requise</small>
+    <h3>Envoyer solde utilisateur</h3>
+    <input id="adminUID" placeholder="UID utilisateur">
+    <input id="adminAmount" placeholder="Montant USDT">
+    <button class="primary" onclick="sendBalance()">Valider envoi</button>
+    <div id="adminMsg"></div>
+    <small>Double confirmation requise</small>
   </div>
 
+  <!-- Gestion des signaux -->
   <div class="card">
     <h3>Gestion des signaux</h3>
     <p>4 signaux toutes les 4 heures</p>
-  </div>// --- ENVOI SOLDE PAR ADMIN ---
-function sendBalance(){
-  const uid = document.getElementById("adminUID").value.trim();
-  const amount = parseFloat(document.getElementById("adminAmount").value);
+    <button class="primary" onclick="adminSignal()">Générer signal</button>
+    <div id="adminSignalMsg" class="notice"></div>
+  </div>
 
-  if(!uid){
-    document.getElementById("adminMsg").innerText = "Veuillez entrer un UID";
-    return;
-  }
-  if(isNaN(amount) || amount <= 0){
-    document.getElementById("adminMsg").innerText = "Montant invalide";
-    return;
-  }
-
-  if(!confirm(`Confirmer l'envoi de ${amount.toFixed(2)} USDT à ${uid} ?`)){
-    document.getElementById("adminMsg").innerText = "Envoi annulé";
-    return;
-  }
-
-  // Simulation en ajoutant le montant à l'utilisateur fictif
-  document.getElementById("adminMsg").innerText = `✅ ${amount.toFixed(2)} USDT envoyés à ${uid} (simulation)`;
-}
-
-// --- GÉNÉRATION SIGNAL ADMIN ---
-function adminSignal(){
-  const gain = (Math.random()*10-5).toFixed(2); // gain aléatoire
-  document.getElementById("adminSignalMsg").innerText = `Signal généré: ${gain} USDT`;
-
-  // Reset le timer des signaux pour tous les utilisateurs
-  lastSignal = Date.now();
-  localStorage.setItem("lastSignalTime", lastSignal);
-
-  alert(`Signal admin généré: ${gain} USDT pour tous les utilisateurs`);
-}
+  <!-- Solde Admin -->
+  <div class="card">
+    <h3>Solde total Admin</h3>
+    <strong id="adminBalance">0 USDT</strong>
+  </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -261,5 +238,38 @@ if(chartEl){
 }
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-</body>
+let adminTotal = 1000; // solde Admin simulé
+
+function sendBalance(){
+  const uid = document.getElementById("adminUID").value.trim();
+  const amount = parseFloat(document.getElementById("adminAmount").value);
+
+  if(!uid){
+    document.getElementById("adminMsg").innerText = "Veuillez entrer un UID";
+    return;
+  }
+  if(isNaN(amount) || amount <= 0){
+    document.getElementById("adminMsg").innerText = "Montant invalide";
+    return;
+  }
+  if(amount > adminTotal){
+    document.getElementById("adminMsg").innerText = "Solde insuffisant";
+    return;
+  }
+  if(!confirm(`Confirmer l'envoi de ${amount.toFixed(2)} USDT à ${uid} ?`)){
+    document.getElementById("adminMsg").innerText = "Envoi annulé";
+    return;
+  }
+
+  adminTotal -= amount;
+  document.getElementById("adminBalance").innerText = adminTotal.toFixed(2) + " USDT";
+  document.getElementById("adminMsg").innerText = `✅ ${amount.toFixed(2)} USDT envoyés à ${uid}`;
+}
+
+function adminSignal(){
+  const gain = (Math.random()*10-5).toFixed(2);
+  document.getElementById("adminSignalMsg").innerText = `Signal généré: ${gain} USDT`;
+  lastSignal = Date.now();
+  alert(`Signal admin généré: ${gain} USDT`);
+}</body>
 </html>
