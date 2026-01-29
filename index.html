@@ -17,7 +17,7 @@ section{padding:40px 15px}
 input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:none}
 small{color:#94a3b8}
 h2,h3{margin-top:0}
-.market{height:300px;background:#020617;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8}
+.market{height:360px;background:#020617;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8}
 .nav{display:flex;gap:10px}
 </style>
 </head>
@@ -197,7 +197,34 @@ new Chart(ctx, {
         }
     }
 });
-</script>
+</script>const chartEl = document.getElementById("tradingChart");
+
+if(chartEl){
+  const ctx = chartEl.getContext("2d");
+
+  const data = {
+    datasets: [{
+      label: "BTC/USDT",
+      data: [
+        {x:1, o:100, h:110, l:95, c:105},
+        {x:2, o:105, h:115, l:100, c:112},
+        {x:3, o:112, h:118, l:108, c:110},
+        {x:4, o:110, h:120, l:109, c:118},
+        {x:5, o:118, h:125, l:115, c:122},
+        {x:6, o:122, h:130, l:120, c:128}
+      ]
+    }]
+  };
+
+  new Chart(ctx, {
+    type: 'candlestick',
+    data: data,
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
 
 </body>
 </html>
