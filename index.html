@@ -89,11 +89,12 @@ h2,h3{margin-top:0}
   <h2>Dashboard Administrateur</h2>
 
   <div class="card">
-    <h3>Envoyer solde utilisateur</h3>
-    <input placeholder="UID utilisateur">
-    <input placeholder="Montant USDT">
-    <button class="primary">Valider envoi</button>
-    <small>Double confirmation requise</small>
+  <h3>Envoyer solde utilisateur</h3>
+  <input id="adminUID" placeholder="UID utilisateur">
+  <input id="adminAmount" placeholder="Montant USDT">
+  <button class="primary" onclick="sendBalance()">Valider envoi</button>
+  <div id="adminMsg"></div>
+  <small>Double confirmation requise</small>
   </div>
 
   <div class="card">
@@ -258,6 +259,7 @@ if(chartEl){
     }
   });
 }
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 </body>
 </html>
