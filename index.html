@@ -2,9 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Trading First – Démo</title>
+<title>Trading First – Version Démo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{margin:0;font-family:Arial;background:#0b0f1a;color:#fff}
 header{position:sticky;top:0;background:#0f172a;padding:12px;display:flex;justify-content:space-between;align-items:center;z-index:1000}
@@ -19,19 +18,18 @@ small{color:#94a3b8}
 h2,h3{margin-top:0}
 .market{height:360px;background:#020617;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#38bdf8}
 .nav{display:flex;gap:10px}
-.contact-card{background:#111827;padding:12px;border-radius:8px;margin-top:20px}
+.contact-card{background:#111827;padding:15px;border-radius:10px;margin-bottom:15px}
 </style>
 </head>
-
 <body>
 
 <header>
   <strong>Trading First</strong>
   <div class="nav">
     <button id="btnLogin" class="secondary" onclick="show('login')">Connexion</button>
-<button id="btnSignup" class="primary" onclick="show('signup')">S’inscrire</button>
-<button id="btnProfile" class="secondary hidden" onclick="logout()">Profil</button>
-  <button id="btnProfile" class="secondary hidden" onclick="logout()">Profil</button></div>
+    <button id="btnSignup" class="primary" onclick="show('signup')">S’inscrire</button>
+    <button id="btnProfile" class="secondary hidden" onclick="logout()">Profil</button>
+  </div>
 </header>
 
 <section id="home">
@@ -57,46 +55,36 @@ h2,h3{margin-top:0}
     <input id="signEmail" placeholder="Email uniquement">
     <input type="password" placeholder="Mot de passe">
     <button class="primary" onclick="signup()">Créer un compte</button>
-    <small>Inscription par email uniquement (sécurité renforcée)</small>
+    <small>Inscription par email uniquement (bonus 8 USDT)</small>
   </div>
 </section>
 
 <section id="user" class="hidden">
   <h2>Tableau de bord utilisateur</h2>
+
   <div class="card">
     <strong>UID utilisateur :</strong> <span id="uid"></span>
   </div>
+
   <div class="card">
-    <h3>Signal de trading</h3>// --- Graphique utilisateur (ligne type exchange) ---
-const userChartEl = document.getElementById("userTradingChart");
-if(userChartEl){
-  const ctx = userChartEl.getContext("2d");
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['09h','10h','11h','12h','13h','14h','15h'],
-      datasets: [{
-        label: 'BTC/USDT',
-        data: [100, 102, 106, 105, 110, 113, 116],
-        borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56, 189, 248, 0.2)',
-        fill: true,
-        tension: 0.3,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      responsive:true,
-      plugins:{legend:{display:true, position:'top'}},
-      scales:{
-        x:{grid:{color:'#1e293b'}},
-        y:{grid:{color:'#1e293b'}}
-      }
-    }
-  });
-}
+    <h3>Solde</h3>
+    <strong id="userBalance">8 USDT</strong>
+  </div>
+
+  <div class="card">
+    <h3>Lien de parrainage</h3>
+    <input type="text" readonly value="https://tradingfirst.com/?ref=UID-XXXX" id="refLink">
+  </div>
+
+  <div class="card">
+    <h3>Signal de trading</h3>
     <button class="primary" onclick="getSignal()">Trader</button>
     <p id="signalMsg"></p>
+  </div>
+
+  <div class="card">
+    <h3>Graphique Trading</h3>
+    <canvas id="tradingChart"></canvas>
   </div>
 </section>
 
@@ -137,6 +125,10 @@ if(userChartEl){
 <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
 
 <script>
+let lastSignal = 0;
+let adminTotal = 1000;
+let userBalance = 8; // bonus initial
+
 function toggleHeaderButtons(isLoggedIn){
   document.getElementById("btnLogin").classList.toggle("hidden", isLoggedIn);
   document.getElementById("btnSignup").classList.toggle("hidden", isLoggedIn);
@@ -146,8 +138,7 @@ function toggleHeaderButtons(isLoggedIn){
 function logout(){
   show("home");
   toggleHeaderButtons(false);
-}let lastSignal = 0;
-let adminTotal = 1000;
+}
 
 function show(id){
   document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
@@ -155,7 +146,7 @@ function show(id){
 }
 
 function signup(){
-  alert("Compte créé (démo)");
+  alert("Compte créé (démo) - Bonus 8 USDT ajouté");
   show("login");
 }
 
@@ -166,9 +157,16 @@ function login(){
   const email = document.getElementById("loginEmail").value.trim();
   const pass  = document.getElementById("loginPass").value.trim();
   if(!email || !pass){ alert("Veuillez remplir tous les champs"); return; }
-  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){ show("admin"); return; }toggleHeaderButtons(true); // montre Profil, cache Connexion/S’inscrire
+
+  if(email === ADMIN_EMAIL && pass === ADMIN_PASS){
+    show("admin");
+    toggleHeaderButtons(true);
+    return;
+  }
 
   document.getElementById("uid").innerText = "UID-" + Math.floor(10000 + Math.random()*90000);
+  document.getElementById("userBalance").innerText = userBalance.toFixed(2) + " USDT";
+  toggleHeaderButtons(true);
   show("user");
 }
 
@@ -193,7 +191,9 @@ function sendBalance(){
   if(amount > adminTotal){ document.getElementById("adminMsg").innerText = "Solde insuffisant"; return; }
   if(!confirm(`Confirmer l'envoi de ${amount.toFixed(2)} USDT à ${uid} ?`)){ document.getElementById("adminMsg").innerText = "Envoi annulé"; return; }
   adminTotal -= amount;
+  userBalance += amount;
   document.getElementById("adminBalance").innerText = adminTotal.toFixed(2) + " USDT";
+  document.getElementById("userBalance").innerText = userBalance.toFixed(2) + " USDT";
   document.getElementById("adminMsg").innerText = `✅ ${amount.toFixed(2)} USDT envoyés à ${uid}`;
 }
 
@@ -201,23 +201,14 @@ function adminSignal(){
   const gain = (Math.random()*10-5).toFixed(2);
   document.getElementById("adminSignalMsg").innerText = `Signal généré: ${gain} USDT`;
   lastSignal = Date.now();
-  alert(`Signal admin généré: ${gain} USDT`);function toggleHeaderButtons(isLoggedIn){
-  document.getElementById("btnLogin").classList.toggle("hidden", isLoggedIn);
-  document.getElementById("btnSignup").classList.toggle("hidden", isLoggedIn);
-  document.getElementById("btnProfile").classList.toggle("hidden", !isLoggedIn);
+  alert(`Signal admin généré: ${gain} USDT`);
 }
 
-function logout(){
-  show("home");
-  toggleHeaderButtons(false);
-  }
-}
-
-// Graphique candlestick dynamique
+// Graphiques candlestick dynamique
 const chartEl = document.getElementById("tradingChart");
 if(chartEl){
   const ctx = chartEl.getContext("2d");
-  const data = {datasets:[{label:"BTC/USDT", data:Array.from({length:20}, (_, i)=>{
+  const data = {datasets:[{label:"BTC/USDT",data:Array.from({length:20}, (_, i)=>{
     const open = 100 + Math.random()*50;
     const close = open + (Math.random()*10-5);
     const high = Math.max(open, close) + Math.random()*5;
