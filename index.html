@@ -104,7 +104,23 @@ h2,h3{margin-top:0}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let lastSignal = 0;
+function getSignal(){
+  const now = Date.now();
+  const FOUR_HOURS = 4 * 60 * 60 * 1000;
+
+  if(now - lastSignal < FOUR_HOURS){
+    const minutes = Math.ceil((FOUR_HOURS - (now - lastSignal)) / 60000);
+    document.getElementById("signalMsg").innerText =
+      "⏳ Signal indisponible – prochain dans " + minutes + " min";
+    return;
+  }
+
+  lastSignal = now;
+  localStorage.setItem("lastSignalTime", lastSignal);
+
+  document.getElementById("signalMsg").innerText =
+    "📈 Signal généré – tendance haussière (simulation)";
+}
 
 function show(id){
   document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
